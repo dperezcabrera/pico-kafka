@@ -216,3 +216,22 @@ def test_slow_consumer_stop_survives_short_produce_timeout(make_container, bus, 
 
             consumer.stop = slow_stop
     container.shutdown()  # no debe lanzar TimeoutError
+
+
+def test_hanging_consumer_stop_never_bricks_shutdown(make_container, bus, caplog):
+    import asyncio as aio
+
+    container = make_container(
+        sys.modules[__name__],
+        config={"kafka": {"consumer_start_timeout_seconds": 0.3}},
+    )
+    for consumers in bus.consumers.values():
+        for consumer in consumers:
+
+            async def hang_forever():
+                await aio.sleep(3600)
+
+            consumer.stop = hang_forever
+    with caplog.at_level("WARNING"):
+        container.shutdown()  # completa con warning, jamas cuelga ni lanza
+    assert "forcing loop stop" in caplog.text

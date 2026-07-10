@@ -59,7 +59,14 @@ class KafkaRegistrar:
     def stop(self) -> None:
         if self._loop is None:
             return
-        self._run(self._shutdown(), timeout=self._settings.consumer_start_timeout_seconds)
+        try:
+            self._run(self._shutdown(), timeout=self._settings.consumer_start_timeout_seconds)
+        except TimeoutError:
+            # Shutdown must NEVER hang the application: log and force the
+            # loop down. Unclean broker disconnect beats a bricked exit.
+            logger.warning(
+                "kafka shutdown timed out after %.0fs; forcing loop stop", self._settings.consumer_start_timeout_seconds
+            )
         self._loop.call_soon_threadsafe(self._loop.stop)
         self._thread.join(timeout=5)
         self._loop.close()

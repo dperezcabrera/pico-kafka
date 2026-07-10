@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-07-10
+
+### Fixed
+
+- `stop()` is best-effort: if the clean shutdown exceeds its deadline, it logs a warning and forces the loop down instead of raising through `container.shutdown()`. An unclean broker disconnect beats a bricked application exit.
+
 ## [0.1.2] - 2026-07-10
 
 ### Fixed
