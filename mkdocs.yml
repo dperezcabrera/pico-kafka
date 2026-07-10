@@ -112,6 +112,11 @@ plugins:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  # ADD YOUR NAV SECTIONS HERE
+  - Architecture: architecture.md
+  - Reference:
+    - reference/index.md
+    - API: reference/api.md
+  - AI Coding Skills: skills.md
   - FAQ: faq.md
+  - Troubleshooting: troubleshooting.md
   - Changelog: CHANGELOG.md
