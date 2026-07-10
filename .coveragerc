@@ -1,0 +1,18 @@
+[run]
+branch = True
+source =
+    pico_kafka
+omit =
+    */_version.py
+
+[paths]
+pico_kafka =
+    src/pico_kafka
+    .tox/*/lib/*/site-packages/pico_kafka
+    .tox/*/site-packages/pico_kafka
+    */site-packages/pico_kafka
+
+[report]
+show_missing = True
+omit =
+    */_version.py
