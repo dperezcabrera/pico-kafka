@@ -173,3 +173,27 @@ def test_producer_is_reused_across_produces(make_container, bus):
     events.order_created({"id": 2})
     assert bus.producer is first
     assert len(first.sent) == 2
+
+
+def test_slow_broker_startup_survives_short_produce_timeout(make_container, bus, monkeypatch):
+    import asyncio as aio
+
+    original_start = type(bus).AIOKafkaConsumer
+
+    def slow_consumer(self, topic, *, bootstrap_servers, group_id):
+        consumer = original_start(self, topic, bootstrap_servers=bootstrap_servers, group_id=group_id)
+        real_start = consumer.start
+
+        async def delayed_start():
+            await aio.sleep(0.5)
+            await real_start()
+
+        consumer.start = delayed_start
+        return consumer
+
+    monkeypatch.setattr(type(bus), "AIOKafkaConsumer", slow_consumer)
+    container = make_container(
+        sys.modules[__name__],
+        config={"kafka": {"produce_timeout_seconds": 0.1, "consumer_start_timeout_seconds": 30}},
+    )
+    assert bus.consumers  # el arranque sobrevivio a un broker mas lento que produce_timeout

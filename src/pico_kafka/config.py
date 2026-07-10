@@ -14,3 +14,6 @@ class KafkaSettings:
     enabled: bool = True
     group_id: str = "pico"
     produce_timeout_seconds: float = 10.0
+    # Cold brokers (fresh KRaft clusters) can take much longer to expose a
+    # coordinator than a produce should ever take.
+    consumer_start_timeout_seconds: float = 60.0

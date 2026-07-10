@@ -27,7 +27,7 @@ src/pico_kafka/
 - One AIOKafkaConsumer per subscribed method; different group_ids on a topic = fan-out, same group = shared partitions.
 - Skip-on-failure: a raising handler logs and the record is SKIPPED (offsets advance; poison records never stall a partition).
 - Lazy producer; JSON values only (no keys/headers in 0.1).
-- Known limit: consumer startup reuses produce_timeout (10s); slow broker kills boot — own startup timeout pending.
+- Consumer startup has its OWN deadline (`consumer_start_timeout_seconds`, default 60s) — never reuse produce_timeout for boot.
 
 ## Boundaries
 

@@ -53,7 +53,7 @@ class KafkaRegistrar:
         consumers = list(self._discover_consumers())
         if consumers:
             self._ensure_loop()
-            self._run(self._start_consumers(consumers))
+            self._run(self._start_consumers(consumers), timeout=self._settings.consumer_start_timeout_seconds)
 
     @cleanup
     def stop(self) -> None:
@@ -88,8 +88,9 @@ class KafkaRegistrar:
             self._thread = threading.Thread(target=self._loop.run_forever, name="pico-kafka", daemon=True)
             self._thread.start()
 
-    def _run(self, coro):
-        return asyncio.run_coroutine_threadsafe(coro, self._loop).result(timeout=self._settings.produce_timeout_seconds)
+    def _run(self, coro, timeout: float | None = None):
+        limit = timeout if timeout is not None else self._settings.produce_timeout_seconds
+        return asyncio.run_coroutine_threadsafe(coro, self._loop).result(timeout=limit)
 
     # ── consumer side ────────────────────────────────────────────
 
