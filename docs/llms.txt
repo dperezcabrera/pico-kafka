@@ -1,0 +1,22 @@
+# pico-kafka
+
+> Kafka producers and consumers for the Pico ecosystem over aiokafka
+
+## Docs
+
+- [Home](https://dperezcabrera.github.io/pico-kafka/)
+- [Getting Started](https://dperezcabrera.github.io/pico-kafka/getting-started/)
+- [Architecture](https://dperezcabrera.github.io/pico-kafka/architecture/)
+- [index](https://dperezcabrera.github.io/pico-kafka/reference/)
+- [API](https://dperezcabrera.github.io/pico-kafka/reference/api/)
+- [AI Coding Skills](https://dperezcabrera.github.io/pico-kafka/skills/)
+- [FAQ](https://dperezcabrera.github.io/pico-kafka/faq/)
+- [Troubleshooting](https://dperezcabrera.github.io/pico-kafka/troubleshooting/)
+- [Changelog](https://dperezcabrera.github.io/pico-kafka/CHANGELOG/)
+
+## For agents
+
+- [Full docs in one file](https://dperezcabrera.github.io/pico-kafka/llms-full.txt)
+- [AGENTS.md (conventions and boundaries)](https://raw.githubusercontent.com/dperezcabrera/pico-kafka/main/AGENTS.md)
+- [Flagship use case (whole ecosystem wired)](https://dperezcabrera.github.io/pico-boot/flagship/)
+- [PyPI](https://pypi.org/project/pico-kafka/)
