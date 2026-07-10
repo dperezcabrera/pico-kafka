@@ -67,6 +67,16 @@ Semantics:
 
 Full documentation: https://dperezcabrera.github.io/pico-kafka/
 
+## AI Coding Skills
+
+Install [Claude Code](https://code.claude.com) or [OpenAI Codex](https://openai.com/index/introducing-codex/) skills for AI-assisted development with pico-kafka:
+
+```bash
+curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash
+```
+
+The `pico-conventions` skill teaches the assistant this module's API surface and invariants; `/add-component` and `/add-tests` scaffold components and tests that use it.
+
 ## License
 
 MIT
