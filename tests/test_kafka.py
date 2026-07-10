@@ -197,3 +197,22 @@ def test_slow_broker_startup_survives_short_produce_timeout(make_container, bus,
         config={"kafka": {"produce_timeout_seconds": 0.1, "consumer_start_timeout_seconds": 30}},
     )
     assert bus.consumers  # el arranque sobrevivio a un broker mas lento que produce_timeout
+
+
+def test_slow_consumer_stop_survives_short_produce_timeout(make_container, bus, monkeypatch):
+    import asyncio as aio
+
+    container = make_container(
+        sys.modules[__name__],
+        config={"kafka": {"produce_timeout_seconds": 0.1, "consumer_start_timeout_seconds": 30}},
+    )
+    for consumers in bus.consumers.values():
+        for consumer in consumers:
+            real_stop = consumer.stop
+
+            async def slow_stop(_real=real_stop):
+                await aio.sleep(0.3)
+                await _real()
+
+            consumer.stop = slow_stop
+    container.shutdown()  # no debe lanzar TimeoutError

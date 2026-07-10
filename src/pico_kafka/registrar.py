@@ -59,7 +59,7 @@ class KafkaRegistrar:
     def stop(self) -> None:
         if self._loop is None:
             return
-        self._run(self._shutdown())
+        self._run(self._shutdown(), timeout=self._settings.consumer_start_timeout_seconds)
         self._loop.call_soon_threadsafe(self._loop.stop)
         self._thread.join(timeout=5)
         self._loop.close()
