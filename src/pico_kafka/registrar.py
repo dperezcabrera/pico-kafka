@@ -57,21 +57,28 @@ class KafkaRegistrar:
 
     @cleanup
     def stop(self) -> None:
-        if self._loop is None:
+        # Atomic ownership: concurrent stops (ASGI lifespan + app code both
+        # calling container.shutdown()) must not interleave — the loser sees
+        # None and returns. pico-ioc >= 2.3.3 also guards at container level.
+        with self._lock:
+            loop, thread = self._loop, self._thread
+            self._loop = None
+            self._thread = None
+        if loop is None:
             return
         try:
-            self._run(self._shutdown(), timeout=self._settings.consumer_start_timeout_seconds)
+            asyncio.run_coroutine_threadsafe(self._shutdown(), loop).result(
+                timeout=self._settings.consumer_start_timeout_seconds
+            )
         except TimeoutError:
             # Shutdown must NEVER hang the application: log and force the
             # loop down. Unclean broker disconnect beats a bricked exit.
             logger.warning(
                 "kafka shutdown timed out after %.0fs; forcing loop stop", self._settings.consumer_start_timeout_seconds
             )
-        self._loop.call_soon_threadsafe(self._loop.stop)
-        self._thread.join(timeout=5)
-        self._loop.close()
-        self._loop = None
-        self._thread = None
+        loop.call_soon_threadsafe(loop.stop)
+        thread.join(timeout=5)
+        loop.close()
 
     async def _shutdown(self) -> None:
         for task in self._tasks:

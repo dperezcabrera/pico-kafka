@@ -238,13 +238,31 @@ def test_hanging_consumer_stop_never_bricks_shutdown(make_container, bus, caplog
 
 
 def test_concurrent_stop_is_safe(make_container, bus):
+    import asyncio
     import threading
 
     container = make_container(sys.modules[__name__])
     registrar = container.get(KafkaRegistrar)
-    threads = [threading.Thread(target=registrar.stop) for _ in range(4)]
+    # loop real corriendo: sin el, el test pasa en vacio (stop retorna en el guard)
+    registrar._loop = asyncio.new_event_loop()
+    registrar._thread = threading.Thread(target=registrar._loop.run_forever, daemon=True)
+    registrar._thread.start()
+    loop = registrar._loop
+
+    errors = []
+
+    def stop():
+        try:
+            registrar.stop()
+        except Exception as e:  # noqa: BLE001
+            errors.append(e)
+
+    threads = [threading.Thread(target=stop) for _ in range(4)]
     for t in threads:
         t.start()
     for t in threads:
         t.join()
-    registrar.stop()  # idempotente
+    registrar.stop()
+    assert errors == []
+    assert registrar._loop is None
+    assert loop.is_closed()

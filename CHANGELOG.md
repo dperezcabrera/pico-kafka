@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.4] - 2026-07-10
+## [0.1.5] - 2026-07-10
 
 ### Fixed
 
-- `stop()` claims the loop and thread atomically under the registrar lock, so concurrent stops (ASGI lifespan plus a manual `container.shutdown()`) can no longer interleave — the loser sees no loop and returns. This was the root cause of the level-2 teardown hang that 0.1.3 only bounded; defense in depth alongside pico-ioc 2.3.3's idempotent container shutdown.
+- `stop()` claims the loop and thread atomically under the registrar lock, so concurrent stops (ASGI lifespan plus a manual `container.shutdown()`) can no longer interleave — the loser sees no loop and returns. This was the root cause of the level-2 teardown hang that 0.1.3 only bounded; defense in depth alongside pico-ioc 2.3.3's idempotent container shutdown. Announced in 0.1.4 but that build shipped without the code change; the regression test now drives a real loop and fails against the 0.1.4 `stop()`.
+
+## [0.1.4] - 2026-07-10
+
+### Added
+
+- Concurrent-stop regression test. The atomic `stop()` it was meant to pin missed this build (the test passed vacuously without a running loop); fixed for real in 0.1.5.
 
 ## [0.1.3] - 2026-07-10
 
