@@ -235,3 +235,16 @@ def test_hanging_consumer_stop_never_bricks_shutdown(make_container, bus, caplog
     with caplog.at_level("WARNING"):
         container.shutdown()  # completa con warning, jamas cuelga ni lanza
     assert "forcing loop stop" in caplog.text
+
+
+def test_concurrent_stop_is_safe(make_container, bus):
+    import threading
+
+    container = make_container(sys.modules[__name__])
+    registrar = container.get(KafkaRegistrar)
+    threads = [threading.Thread(target=registrar.stop) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    registrar.stop()  # idempotente
