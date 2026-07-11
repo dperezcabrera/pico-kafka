@@ -8,7 +8,6 @@ import asyncio
 import json
 
 import pytest
-from pico_ioc import DictSource, configuration, init
 
 import pico_kafka.registrar as registrar_module
 
@@ -79,11 +78,6 @@ class FakeBus:
         return FakeProducer(self, bootstrap_servers)
 
 
-@pytest.fixture(autouse=True)
-def isolate_from_installed_plugins(monkeypatch):
-    monkeypatch.setenv("PICO_BOOT_AUTO_PLUGINS", "false")
-
-
 @pytest.fixture
 def bus(monkeypatch):
     fake = FakeBus()
@@ -113,18 +107,15 @@ def deliver(bus):
 
 
 @pytest.fixture
-def make_container(bus):
-    created = []
+def make_container(make_container, bus):
+    """Extends the plugin fixture: deliver() needs the registrar loop on the fake bus."""
+    plugin_make = make_container
 
     def _make(*modules, config=None):
-        cfg = configuration(DictSource(config or {}))
-        container = init(modules=["pico_kafka", *modules], config=cfg)
-        created.append(container)
+        container = plugin_make(*modules, config=config)
         from pico_kafka import KafkaRegistrar
 
         bus.loop = container.get(KafkaRegistrar)._loop
         return container
 
-    yield _make
-    for c in reversed(created):
-        c.shutdown()
+    return _make
