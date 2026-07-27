@@ -1,0 +1,40 @@
+# pico-kafka
+
+> Kafka producers and consumers for the Pico ecosystem over aiokafka
+
+Install: `pip install pico-kafka`. Import surface: `from pico_kafka import ...`.
+
+## Usage
+
+```python
+from pico_ioc import component
+from pico_kafka import kafka_consumer
+
+@component
+class OrderProjection:
+    @kafka_consumer("orders")
+    async def on_order(self, message: dict):
+        ...
+
+    @kafka_consumer("orders", group_id="analytics")   # independent fan-out
+    def on_order_analytics(self, message: dict):
+        ...
+```
+
+## Public API
+
+- `class KafkaSettings` — ``enabled: false`` disables consumers and producers entirely.
+- `kafka_consumer(topic: str, *, group_id: str='')` — Subscribe a component method to ``topic``.
+- `kafka_producer(cls)` — Turn a class of ``@produce`` stubs into an injectable component.
+- `produce(topic: str)` — Generate a producing implementation for a stub method.
+- `class KafkaRegistrar`
+
+## Docs
+
+- docs/CHANGELOG.md
+- docs/architecture.md
+- docs/faq.md
+- docs/getting-started.md
+- docs/reference/ (2 pages)
+- docs/skills.md
+- docs/troubleshooting.md
