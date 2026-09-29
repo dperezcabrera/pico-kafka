@@ -27,7 +27,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "pico-ioc >= 2.2.0",
+    "pico-ioc >= 2.3.3",
     "aiokafka >= 0.11",
 ]
 

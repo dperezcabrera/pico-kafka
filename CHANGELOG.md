@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Dependency floors raised to what the test suite proves: `pico-ioc >= 2.3.3` (was 2.2.0; below 2.3.0 the settings prefix fails to resolve). A new CI job runs the suite with every declared floor pinned, so a floor that installs but does not work can no longer ship.
+
 ### Added
 - `__all__` declares the public API and `tests/test_exports.py` pins it, per the ecosystem stability policy (ADR-014 in pico-ioc).
 
